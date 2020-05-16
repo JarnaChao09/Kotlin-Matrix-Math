@@ -3,25 +3,29 @@ package symbolic
 import kotlin.math.pow
 
 sealed class Fun: Stringify, EvalFun<Fun, Constant> {
-    operator fun plus(other: Fun) = Sum(this, other)
-
-    operator fun times(other: Fun) = Product(this, other)
-
-    operator fun unaryPlus() = this
-
-    operator fun unaryMinus() = Product((-1).const, this)
-
-    operator fun minus(other: Fun) = Sum(this, -other)
-
-    val reciprocal
+    val reciprocal: Fun
         get() = Power(this, (-1).const)
 
-    operator fun div(other: Fun) = Product(this, other.reciprocal)
-
-    infix fun pow(other: Fun) = Power(this, other)
-
-    val exp
+    val exp: Fun
         get() = Power(kotlin.math.E.const, this)
+
+    operator fun unaryPlus(): Fun = this
+
+    operator fun unaryMinus(): Fun = Product((-1).const, this)
+
+    operator fun plus(other: Fun): Fun = Sum(this, other)
+
+    operator fun minus(other: Fun): Fun = Sum(this, -other)
+
+    operator fun times(other: Fun): Fun = Product(this, other)
+
+    operator fun div(other: Fun): Fun = Product(this, other.reciprocal)
+
+    fun eval(vararg values: Pair<Fun, Constant>) = this.eval(mapOf(*values))
+
+    operator fun invoke(value: Map<Fun, Constant>) = this.eval(value)
+
+    operator fun invoke(vararg values: Pair<Fun, Constant>) = this.eval(*values)
 }
 
 data class Constant(val value: Double): Fun() {
@@ -30,6 +34,8 @@ data class Constant(val value: Double): Fun() {
     override fun stringify(): String = "$value"
 
     override fun eval(value: Map<Fun, Constant>): Double = this.value
+
+    override fun toString(): String = this.value.toString()
 }
 
 data class Variable(val name: String): Fun() {
@@ -45,18 +51,24 @@ data class Variable(val name: String): Fun() {
         }
         throw NoValueException(this)
     }
+
+    override fun toString(): String = this.name
 }
 
 data class Sum(val a: Fun, val b: Fun): Fun() {
     override fun stringify(): String = "(${a.stringify()} + ${b.stringify()})"
 
     override fun eval(value: Map<Fun, Constant>): Double = a.eval(value) + b.eval(value)
+
+    override fun toString(): String = "Sum(${this.a}, ${this.b})"
 }
 
 data class Product(val a: Fun, val b: Fun): Fun() {
     override fun stringify(): String = "(${a.stringify()} * ${a.stringify()})"
 
     override fun eval(value: Map<Fun, Constant>): Double = a.eval(value) * b.eval(value)
+
+    override fun toString(): String = "Product(${this.a}, ${this.b})"
 }
 
 data class Power(val base: Fun, val exponent: Fun): Fun() {
@@ -64,6 +76,8 @@ data class Power(val base: Fun, val exponent: Fun): Fun() {
 
     override fun eval(value: Map<Fun, Constant>): Double =
         base.eval(value).pow(exponent.eval(value))
+
+    override fun toString(): String = "Power(${this.base}, ${this.exponent})"
 }
 
 data class Ln(val a: Fun): Fun() {
@@ -71,6 +85,8 @@ data class Ln(val a: Fun): Fun() {
 
     override fun eval(value: Map<Fun, Constant>): Double =
         kotlin.math.ln(a.eval(value))
+
+    override fun toString(): String = "Ln(${this.a})"
 }
 
 data class Sin(val a: Fun): Fun() {
@@ -78,14 +94,15 @@ data class Sin(val a: Fun): Fun() {
 
     override fun eval(value: Map<Fun, Constant>): Double =
         kotlin.math.sin(a.eval(value))
+
+    override fun toString(): String = "Sin(${this.a})"
 }
 
-val Number.const: Constant
-    get() = Constant(this)
+data class Cos(val a: Fun): Fun() {
+    override fun stringify(): String = "cos(${a.stringify()})"
 
-fun sin(x: Fun) = Sin(x)
-fun cos(x: Fun) = sin(kotlin.math.PI.const / 2.const - x)
-fun tan(x: Fun) = sin(x) / cos(x)
-fun csc(x: Fun) = sin(x).reciprocal
-fun sec(x: Fun) = cos(x).reciprocal
-fun cot(x: Fun) = tan(x).reciprocal
+    override fun eval(value: Map<Fun, Constant>): Double =
+        kotlin.math.cos(a.eval(value))
+
+    override fun toString(): String = "Cos(${this.a})"
+}
