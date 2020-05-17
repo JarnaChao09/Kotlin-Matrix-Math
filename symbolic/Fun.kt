@@ -2,7 +2,9 @@ package symbolic
 
 import kotlin.math.pow
 
-sealed class Fun: Stringify, EvalFun<Fun, Constant> {
+sealed class Fun(
+    open val variables: Set<Variable> = emptySet()
+): Simplify<Fun>, Stringify, Differentiable<Variable, Fun>, EvalFun<Fun, Constant> {
     val reciprocal: Fun
         get() = Power(this, (-1).const)
 
@@ -23,15 +25,31 @@ sealed class Fun: Stringify, EvalFun<Fun, Constant> {
 
     fun eval(vararg values: Pair<Fun, Constant>) = this.eval(mapOf(*values))
 
+    fun evalAllAtZero(): Double {
+        val map = emptyMap<Fun, Constant>().toMutableMap()
+        for (i in variables) {
+            map[i] = 0.const
+        }
+        return this.eval(map)
+    }
+
     operator fun invoke(value: Map<Fun, Constant>) = this.eval(value)
 
     operator fun invoke(vararg values: Pair<Fun, Constant>) = this.eval(*values)
+
+    override fun simplify(): Fun = this
 }
 
 data class Constant(val value: Double): Fun() {
     constructor(n: Number): this(n.toDouble())
 
-    override fun stringify(): String = "$value"
+    override fun stringify(): String = when (value) {
+        kotlin.math.PI -> "PI"
+        kotlin.math.E -> "E"
+        else -> "$value"
+    }
+
+    override fun diff(by: Variable): Fun = 0.const
 
     override fun eval(value: Map<Fun, Constant>): Double = this.value
 
@@ -39,8 +57,15 @@ data class Constant(val value: Double): Fun() {
 }
 
 data class Variable(val name: String): Fun() {
+    override val variables: Set<Variable>
+        get() = setOf(this)
+
     class NoValueException(x: Variable): Throwable("No Value Given for ${x.stringify()}")
+
     override fun stringify(): String = name
+
+    override fun diff(by: Variable): Fun =
+        if (this == by) 1.const else 0.const
 
     override fun eval(value: Map<Fun, Constant>): Double {
         loop@for ((i, j) in value) {
@@ -56,7 +81,23 @@ data class Variable(val name: String): Fun() {
 }
 
 data class Sum(val a: Fun, val b: Fun): Fun() {
+    override val variables: Set<Variable>
+        get() = setOf(*this.a.variables.toTypedArray(), *this.b.variables.toTypedArray())
+
+    override fun simplify(): Fun {
+        val a_ = a.simplify()
+        val b_ = b.simplify()
+        return when {
+            a_ == 0.const -> b_
+            b_ == 0.const -> a_
+            a_ is Constant && b_ is Constant && a_.value != kotlin.math.PI && b_.value != kotlin.math.PI -> this.evalAllAtZero().const
+            else -> a_ + b_
+        }
+    }
+
     override fun stringify(): String = "(${a.stringify()} + ${b.stringify()})"
+
+    override fun diff(by: Variable): Fun = this.a.diff(by) + this.b.diff(by)
 
     override fun eval(value: Map<Fun, Constant>): Double = a.eval(value) + b.eval(value)
 
@@ -64,7 +105,12 @@ data class Sum(val a: Fun, val b: Fun): Fun() {
 }
 
 data class Product(val a: Fun, val b: Fun): Fun() {
-    override fun stringify(): String = "(${a.stringify()} * ${a.stringify()})"
+    override val variables: Set<Variable>
+        get() = setOf(*this.a.variables.toTypedArray(), *this.b.variables.toTypedArray())
+
+    override fun stringify(): String = "(${this.a.stringify()} * ${this.b.stringify()})"
+
+    override fun diff(by: Variable): Fun = this.a.diff(by) * this.b.diff(by)
 
     override fun eval(value: Map<Fun, Constant>): Double = a.eval(value) * b.eval(value)
 
@@ -72,7 +118,13 @@ data class Product(val a: Fun, val b: Fun): Fun() {
 }
 
 data class Power(val base: Fun, val exponent: Fun): Fun() {
+    override val variables: Set<Variable>
+        get() = setOf(*this.base.variables.toTypedArray(), *this.exponent.variables.toTypedArray())
+
     override fun stringify(): String = "(${base.stringify()} ^ ${exponent.stringify()})"
+
+    override fun diff(by: Variable): Fun =
+        this.exponent * (this.base pow (this.exponent - 1.const)) * this.base.diff(by) + (this.base pow (this.exponent)) * Ln(this.base) * this.exponent.diff(by)
 
     override fun eval(value: Map<Fun, Constant>): Double =
         base.eval(value).pow(exponent.eval(value))
@@ -81,16 +133,28 @@ data class Power(val base: Fun, val exponent: Fun): Fun() {
 }
 
 data class Ln(val a: Fun): Fun() {
+    override val variables: Set<Variable>
+        get() = this.a.variables
+
     override fun stringify(): String = "ln(${a.stringify()})"
 
-    override fun eval(value: Map<Fun, Constant>): Double =
-        kotlin.math.ln(a.eval(value))
+    override fun diff(by: Variable): Fun = this.a.reciprocal * this.a.diff(by)
+
+    override fun eval(value: Map<Fun, Constant>): Double = when(val calc = a.eval(value)) {
+        0.0 -> Double.MIN_VALUE
+        else -> kotlin.math.ln(calc)
+    }
 
     override fun toString(): String = "Ln(${this.a})"
 }
 
 data class Sin(val a: Fun): Fun() {
+    override val variables: Set<Variable>
+        get() = this.a.variables
+
     override fun stringify(): String = "sin(${a.stringify()})"
+
+    override fun diff(by: Variable): Fun = cos(a) * a.diff(by)
 
     override fun eval(value: Map<Fun, Constant>): Double =
         kotlin.math.sin(a.eval(value))
@@ -99,7 +163,12 @@ data class Sin(val a: Fun): Fun() {
 }
 
 data class Cos(val a: Fun): Fun() {
+    override val variables: Set<Variable>
+        get() = this.a.variables
+
     override fun stringify(): String = "cos(${a.stringify()})"
+
+    override fun diff(by: Variable): Fun = -sin(a) * a.diff(by)
 
     override fun eval(value: Map<Fun, Constant>): Double =
         kotlin.math.cos(a.eval(value))

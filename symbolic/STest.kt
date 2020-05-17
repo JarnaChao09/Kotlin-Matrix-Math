@@ -1,19 +1,39 @@
 package symbolic
 
 fun main() {
-    val x = Variable("x")
+//    val x = Variable("x")
+//
+//    println(x)
+//
+//    val y = x + 10
+//
+//    println(y)
+//
+//    val z by Var()
+//
+//    val t = y + z
+//
+//    println(t)
+//
+//    println(t(x to 2, z to 4))
+//
+//    val t2 = t + 2.const * z
+//
+//    println(t2.stringify())
+//
+//    println(t2.variables)
 
-    println(x)
+    val x by Var()
 
-    val y = x + 10
+    val y = x pow 2
 
-    println(y)
+    println(y.diff(x).stringify())
 
-    val z by Var()
+    println(y.diff(x).evalAllAtZero())
 
-    val t = y + z
+    val y1 = x + 10
 
-    println(t)
+    val y1Prime = d(y1) / d(x)
 
-    println(t(x to 2, z to 4))
+    println(y1Prime(x to 2))
 }

@@ -1,5 +1,5 @@
 package symbolic
 
-interface Differentiable<T: Differentiable<T>> {
-    fun diff(): T
+interface Differentiable<V, T: Differentiable<V, T>> {
+    fun diff(by: V): T
 }
