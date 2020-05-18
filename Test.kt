@@ -279,4 +279,8 @@ fun main() {
 //        !12
 //        !13
 //    })
+
+    val test = IntMatrix.of(2 by 2, 7, 6, 3, 9)
+
+    println(test.rank())
 }

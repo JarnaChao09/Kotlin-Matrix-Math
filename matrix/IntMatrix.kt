@@ -244,10 +244,6 @@ class IntMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Int): NumberMatrix<Int
         return sum
     }
 
-    override fun rank(): Int {
-        TODO("Not yet implemented")
-    }
-
     override fun inverse(): IntMatrix {
         TODO("Not yet implemented")
     }

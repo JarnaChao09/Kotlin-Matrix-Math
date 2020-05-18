@@ -6,6 +6,7 @@ import complex.conjugate
 import complex.times
 import utils.Size
 import vector.Vector
+import kotlin.math.absoluteValue
 
 abstract class NumberMatrix<T>(dim: Size, initBlock: (r: Int, c: Int) -> T): Matrix<T>(dim = dim, initBlock = initBlock) where T: Number {
     constructor(x: Int, y: Int, initBlock: (Int) -> T): this(dim = Size(
@@ -56,7 +57,36 @@ abstract class NumberMatrix<T>(dim: Size, initBlock: (r: Int, c: Int) -> T): Mat
 
     abstract fun trace(): T
 
-    abstract fun rank(): Int
+    @Suppress("UNCHECKED_CAST")
+    fun rank(): T {
+        val a = this.toList().toMutableList()
+        val lastCol = this.colLength - 1
+        val lastRow = this.rowLength - 1
+        var pivotRow = 0
+        var prevPivot = 1
+        for (k in 0..lastCol) {
+            val switchRow = (pivotRow .. lastRow).find { a[it][k].toInt() != 0 }
+
+            if (switchRow != null) {
+                if (pivotRow != switchRow) {
+                    val temp = a[switchRow]
+                    a[switchRow] = a[pivotRow]
+                    a[pivotRow] = temp
+                }
+                val pivot = a[pivotRow][k]
+                for (i in (pivotRow+1)..lastRow) {
+                    val ai = a[i].toMutableList()
+                    for (j in (k+1)..lastCol) {
+                        ai[j] = ((pivot.toDouble() * ai[j].toDouble() - ai[k].toDouble() * a[pivotRow][j].toDouble()) / prevPivot) as T
+                    }
+                }
+                pivotRow += 1
+                prevPivot = pivot.toInt()
+            }
+        }
+        return pivotRow as T
+    }
+
 
     abstract fun inverse(): NumberMatrix<T>
 

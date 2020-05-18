@@ -234,11 +234,7 @@ class DoubleMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Double): NumberMatr
         return sum
     }
 
-    override fun rank(): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun inverse(): NumberMatrix<Double> {
+    override fun inverse(): DoubleMatrix {
         TODO("Not yet implemented")
     }
 
