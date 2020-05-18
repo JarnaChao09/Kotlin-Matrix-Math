@@ -23,12 +23,7 @@ sealed class Fun(
 
     operator fun div(other: Fun): Fun = Product(this, other.reciprocal)
 
-    fun eval(vararg values: Pair<Fun, Constant>) =
-        try {
-            this.eval(mapOf(*values))
-        } catch(e: Variable.NoValueException) {
-            this.partialEval(mapOf(*values))
-        }
+    fun eval(vararg values: Pair<Fun, Constant>) = this.eval(mapOf(*values))
 
     fun evalAllAtZero(): Fun {
         val map = emptyMap<Fun, Constant>().toMutableMap()
@@ -46,12 +41,7 @@ sealed class Fun(
         return this.eval(map)
     }
 
-    operator fun invoke(value: Map<Fun, Constant>) =
-        try {
-            this.eval(value)
-        } catch(e: Variable.NoValueException) {
-            this.partialEval(value)
-        }
+    operator fun invoke(value: Map<Fun, Constant>) = this.eval(value)
 
     operator fun invoke(vararg values: Pair<Fun, Constant>) = this.eval(*values)
 
@@ -71,7 +61,7 @@ data class Constant(val value: Double): Fun() {
 
     override fun diff(by: Variable): Fun = 0.const
 
-    override fun evalImpl(value: Map<Fun, Constant>): Double = this.value
+    override fun fullEval(value: Map<Fun, Constant>): Double = this.value
 
     override fun partialEval(value: Map<Fun, Constant>): Fun = this.eval(value)
 
@@ -82,14 +72,14 @@ data class Variable(val name: String): Fun() {
     override val variables: Set<Variable>
         get() = setOf(this)
 
-    class NoValueException(x: Variable): Throwable("No Value Given for ${x.stringify()}")
+    class NoValueException(x: Variable): Exception("No Value Given for ${x.stringify()}")
 
     override fun stringify(): String = name
 
     override fun diff(by: Variable): Fun =
         if (this == by) 1.const else 0.const
 
-    override fun evalImpl(value: Map<Fun, Constant>): Double {
+    override fun fullEval(value: Map<Fun, Constant>): Double {
         loop@for ((i, j) in value) {
             when(i) {
                 this -> return j.value
@@ -131,7 +121,7 @@ data class Sum(val a: Fun, val b: Fun): Fun() {
 
     override fun diff(by: Variable): Fun = this.a.diff(by) + this.b.diff(by)
 
-    override fun evalImpl(value: Map<Fun, Constant>): Double = a.evalImpl(value) + b.evalImpl(value)
+    override fun fullEval(value: Map<Fun, Constant>): Double = a.fullEval(value) + b.fullEval(value)
 
     override fun partialEval(value: Map<Fun, Constant>): Fun = a.partialEval(value) + b.partialEval(value)
 
@@ -162,7 +152,7 @@ data class Product(val a: Fun, val b: Fun): Fun() {
 
     override fun diff(by: Variable): Fun = this.a.diff(by) * this.b.diff(by)
 
-    override fun evalImpl(value: Map<Fun, Constant>): Double = a.evalImpl(value) * b.evalImpl(value)
+    override fun fullEval(value: Map<Fun, Constant>): Double = a.fullEval(value) * b.fullEval(value)
 
     override fun partialEval(value: Map<Fun, Constant>): Fun = a.partialEval(value) * b.partialEval(value)
 
@@ -203,8 +193,8 @@ data class Power(val base: Fun, val exponent: Fun): Fun() {
             }
         }
 
-    override fun evalImpl(value: Map<Fun, Constant>): Double =
-        base.evalImpl(value).pow(exponent.evalImpl(value))
+    override fun fullEval(value: Map<Fun, Constant>): Double =
+        base.fullEval(value).pow(exponent.fullEval(value))
 
     override fun partialEval(value: Map<Fun, Constant>): Fun = base.partialEval(value) pow exponent.partialEval(value)
 
@@ -229,7 +219,7 @@ data class Ln(val a: Fun): Fun() {
 
     override fun diff(by: Variable): Fun = this.a.reciprocal * this.a.diff(by)
 
-    override fun evalImpl(value: Map<Fun, Constant>): Double = when(val calc = a.evalImpl(value)) {
+    override fun fullEval(value: Map<Fun, Constant>): Double = when(val calc = a.fullEval(value)) {
         0.0 -> Double.MIN_VALUE
         else -> kotlin.math.ln(calc)
     }
@@ -252,8 +242,8 @@ data class Sin(val a: Fun): Fun() {
 
     override fun diff(by: Variable): Fun = cos(a) * a.diff(by)
 
-    override fun evalImpl(value: Map<Fun, Constant>): Double =
-        kotlin.math.sin(a.evalImpl(value))
+    override fun fullEval(value: Map<Fun, Constant>): Double =
+        kotlin.math.sin(a.fullEval(value))
 
     override fun partialEval(value: Map<Fun, Constant>): Fun =
         Sin(a.partialEval(value))
@@ -271,8 +261,8 @@ data class Cos(val a: Fun): Fun() {
 
     override fun diff(by: Variable): Fun = -sin(a) * a.diff(by)
 
-    override fun evalImpl(value: Map<Fun, Constant>): Double =
-        kotlin.math.cos(a.evalImpl(value))
+    override fun fullEval(value: Map<Fun, Constant>): Double =
+        kotlin.math.cos(a.fullEval(value))
 
     override fun partialEval(value: Map<Fun, Constant>): Fun =
         Cos(a.partialEval(value))
