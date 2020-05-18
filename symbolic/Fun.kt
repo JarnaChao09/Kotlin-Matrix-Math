@@ -48,6 +48,8 @@ sealed class Fun(
     override fun simplify(): Fun = this
 
     fun simpleString(): String = this.simplify().stringify()
+
+    abstract fun sub(replace: Variable, with: Fun): Fun
 }
 
 data class Constant(val value: Double): Fun() {
@@ -66,6 +68,8 @@ data class Constant(val value: Double): Fun() {
     override fun partialEval(value: Map<Fun, Constant>): Fun = this.eval(value)
 
     override fun toString(): String = "Constant(${this.value})"
+
+    override fun sub(replace: Variable, with: Fun): Fun = this
 }
 
 data class Variable(val name: String): Fun() {
@@ -100,6 +104,9 @@ data class Variable(val name: String): Fun() {
     }
 
     override fun toString(): String = this.name
+
+    override fun sub(replace: Variable, with: Fun): Fun =
+        if (this == replace) with else this
 }
 
 data class Sum(val a: Fun, val b: Fun): Fun() {
@@ -126,6 +133,8 @@ data class Sum(val a: Fun, val b: Fun): Fun() {
     override fun partialEval(value: Map<Fun, Constant>): Fun = a.partialEval(value) + b.partialEval(value)
 
     override fun toString(): String = "Sum(${this.a}, ${this.b})"
+
+    override fun sub(replace: Variable, with: Fun): Fun = a.sub(replace, with) + b.sub(replace, with)
 }
 
 data class Product(val a: Fun, val b: Fun): Fun() {
@@ -157,6 +166,8 @@ data class Product(val a: Fun, val b: Fun): Fun() {
     override fun partialEval(value: Map<Fun, Constant>): Fun = a.partialEval(value) * b.partialEval(value)
 
     override fun toString(): String = "Product(${this.a}, ${this.b})"
+
+    override fun sub(replace: Variable, with: Fun): Fun = a.sub(replace, with) * b.sub(replace, with)
 }
 
 data class Power(val base: Fun, val exponent: Fun): Fun() {
@@ -199,6 +210,8 @@ data class Power(val base: Fun, val exponent: Fun): Fun() {
     override fun partialEval(value: Map<Fun, Constant>): Fun = base.partialEval(value) pow exponent.partialEval(value)
 
     override fun toString(): String = "Power(${this.base}, ${this.exponent})"
+
+    override fun sub(replace: Variable, with: Fun): Fun = base.sub(replace, with) pow exponent.sub(replace, with)
 }
 
 data class Ln(val a: Fun): Fun() {
@@ -230,6 +243,8 @@ data class Ln(val a: Fun): Fun() {
     }
 
     override fun toString(): String = "Ln(${this.a})"
+
+    override fun sub(replace: Variable, with: Fun): Fun = Ln(a.sub(replace, with))
 }
 
 data class Sin(val a: Fun): Fun() {
@@ -249,6 +264,8 @@ data class Sin(val a: Fun): Fun() {
         Sin(a.partialEval(value))
 
     override fun toString(): String = "Sin(${this.a})"
+
+    override fun sub(replace: Variable, with: Fun): Fun = Sin(a.sub(replace, with))
 }
 
 data class Cos(val a: Fun): Fun() {
@@ -268,4 +285,6 @@ data class Cos(val a: Fun): Fun() {
         Cos(a.partialEval(value))
 
     override fun toString(): String = "Cos(${this.a})"
+
+    override fun sub(replace: Variable, with: Fun): Fun = Cos(a.sub(replace, with))
 }

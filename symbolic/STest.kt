@@ -44,4 +44,6 @@ fun main() {
     val c = a + b
 
     println(c(b to 2).simpleString())
+
+    println(c.sub(a, Variable("t") pow 2).simpleString())
 }
