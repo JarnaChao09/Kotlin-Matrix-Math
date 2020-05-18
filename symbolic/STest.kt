@@ -27,13 +27,21 @@ fun main() {
 
     val y = x pow 2
 
-    println(y.diff(x).stringify())
+    println(y.diff(x).simpleString())
 
-    println(y.diff(x).evalAllAtZero())
+    println(y.diff(x).evalAllAtZero().simpleString())
 
     val y1 = x + 10
 
     val y1Prime = d(y1) / d(x)
 
-    println(y1Prime(x to 2))
+    println(y1Prime(x to 2).simpleString())
+
+    val a by Var()
+
+    val b by Var()
+
+    val c = a + b
+
+    println(c(b to 2).simpleString())
 }

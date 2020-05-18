@@ -95,7 +95,7 @@ sealed class Expression {
                 theA == 0.constant -> 0.constant
                 theB == 0.constant -> 1.constant
                 theB == 1.constant -> theA
-                theA is Number && theB is Number -> res(0).constant
+                theA is Constant && theB is Constant -> res(0).constant
                 else -> Pow(theA, theB)
             }
         }
