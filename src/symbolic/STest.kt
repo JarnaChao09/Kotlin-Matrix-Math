@@ -46,4 +46,8 @@ fun main() {
     println(c(b to 2).simpleString())
 
     println(c.sub(a, Variable("t") pow 2).simpleString())
+
+    val test2 = ((x pow 2) + 2 * x) * ((x pow 3) + 4)
+
+    println(test2.diff(x).simpleString())
 }

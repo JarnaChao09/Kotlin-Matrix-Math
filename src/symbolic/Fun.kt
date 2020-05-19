@@ -159,7 +159,7 @@ data class Product(val a: Fun, val b: Fun): Fun() {
 
     override fun stringify(): String = "(${this.a.stringify()} * ${this.b.stringify()})"
 
-    override fun diff(by: Variable): Fun = this.a.diff(by) * this.b.diff(by)
+    override fun diff(by: Variable): Fun = this.a * this.b.diff(by) + this.b * this.a.diff(by)
 
     override fun fullEval(value: Map<Fun, Constant>): Double = a.fullEval(value) * b.fullEval(value)
 
