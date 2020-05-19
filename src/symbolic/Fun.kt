@@ -148,6 +148,10 @@ data class Product(val a: Fun, val b: Fun): Fun() {
             a_ == 0.const || b_ == 0.const -> 0.const
             a_ == 1.const -> b_
             b_ == 1.const -> a_
+            a_ is Sum && b_ !is Sum ->
+                (a_.a * b_).simplify() + (a_.b * b_).simplify()
+            a_ is Sum && b_ is Sum ->
+                (a_.a * b_.a).simplify() + (a_.a * b_.b).simplify() + (a_.b * b_.a).simplify() + (a_.b * b_.b).simplify()
             a_ is Constant &&
                     b_ is Constant &&
                     a_.value != kotlin.math.PI &&
