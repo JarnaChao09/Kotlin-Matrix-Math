@@ -121,6 +121,74 @@ data class Sum(val a: Fun, val b: Fun): Fun() {
 
             b_ == 0.const -> a_
 
+//            a_ is Product && b_ is Product -> { // cancels out lines 225 && 228
+//                when {
+//                    a_.a.simplify() == b_.a.simplify() -> (a_.b.simplify() + b_.b.simplify()).simplify() * a_.a.simplify()
+//                    a_.b.simplify() == b_.a.simplify() -> (a_.a.simplify() + b_.b.simplify()).simplify() * a_.b.simplify()
+//                    a_.a.simplify() == b_.b.simplify() -> (a_.b.simplify() + b_.a.simplify()).simplify() * a_.a.simplify()
+//                    a_.b.simplify() == b_.b.simplify() -> (a_.a.simplify() + b_.a.simplify()).simplify() * a_.b.simplify()
+//                    else -> a_ + b_
+//                }
+//            }
+
+            a_ is Sum && b_ !is Sum -> {
+                when(b_) {
+                    is Product -> {
+                        when {
+                            a_.a is Product -> {
+                                when {
+                                    a_.a.a.simplify() == b_.a.simplify() ->
+                                        ((a_.a.a.simplify() * (a_.a.b.simplify() + b_.b.simplify()).simplify()).simplify() + a_.b.simplify()).simplify()
+                                    a_.a.b.simplify() == b_.a.simplify() ->
+                                        (((a_.a.a.simplify() + b_.b.simplify()).simplify() * a_.a.b.simplify()).simplify() + a_.b.simplify()).simplify()
+                                    a_.a.a.simplify() == b_.b.simplify() ->
+                                        ((a_.a.a.simplify() * (a_.a.b.simplify() + b_.a.simplify()).simplify()).simplify() + a_.b.simplify()).simplify()
+                                    a_.a.b.simplify() == b_.b.simplify() ->
+                                        (((a_.a.a.simplify() + b_.a.simplify()).simplify() * a_.a.b.simplify()).simplify() + a_.b.simplify()).simplify()
+                                    else -> a_ + b_
+                                }
+                            }
+                            a_.b is Product -> {
+                                when {
+                                    a_.b.a.simplify() == b_.a.simplify() ->
+                                        ((a_.b.a.simplify() * (a_.b.b.simplify() + b_.b.simplify()).simplify()).simplify() + a_.a.simplify()).simplify()
+                                    a_.b.b.simplify() == b_.a.simplify() ->
+                                        (((a_.b.a.simplify() + b_.b.simplify()).simplify() * a_.b.b.simplify()).simplify() + a_.a.simplify()).simplify()
+                                    a_.b.a.simplify() == b_.b.simplify() ->
+                                        ((a_.b.a.simplify() * (a_.b.b.simplify() + b_.a.simplify()).simplify()).simplify() + a_.a.simplify()).simplify()
+                                    a_.b.b.simplify() == b_.b.simplify() ->
+                                        (((a_.b.a.simplify() + b_.a.simplify()).simplify() * a_.b.b.simplify()).simplify() + a_.a.simplify()).simplify()
+                                    else -> a_ + b_
+                                }
+                            }
+                            else -> a_ + b_
+                        }
+                    }
+                    is Power -> {
+                        TODO()
+                    }
+//                    is Constant -> {
+//                        TODO()
+//                    }
+                    is Variable -> {
+                        TODO()
+                    }
+                    is Sum -> {
+                        TODO()
+                    }
+                    is Ln -> {
+                        TODO()
+                    }
+                    is Sin -> {
+                        TODO()
+                    }
+                    is Cos -> {
+                        TODO()
+                    }
+                    else -> a_ + b_
+                }
+            }
+
             a_ is Constant && b_ is Constant && a_.value != kotlin.math.PI && b_.value != kotlin.math.PI -> this.evalAllAtZero()
 
             else -> a_ + b_
@@ -238,7 +306,7 @@ data class Product(val a: Fun, val b: Fun): Fun() {
                             b_.a.simplify() * a_.a.simplify() * (b_.b.simplify() * a_.b.simplify()).simplify()
                         }
                     }
-                    else -> a_.simplify() * b_.simplify()
+                    else -> a_ * b_
                 }.simplify()
             }
 

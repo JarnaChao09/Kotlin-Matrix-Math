@@ -49,7 +49,7 @@ fun main() {
 
     val test2 = ((x pow 2) + 2 * x) * ((x pow 3) + 4)
 
-    println((test2.diff(x).simplify() as Sum).b)
+    println((((test2.diff(x).simplify() as Sum).b as Sum).a as Sum).a)
 
     println(test2.diff(x).simpleString())
 
@@ -64,4 +64,16 @@ fun main() {
     val test5 = (4 * (x pow 2)) * (3 * (x pow 2))
 
     println(test5.simpleString())
+
+    val test6 = (2 * (x pow 2)) + (4 * (x pow 2))
+
+    println(test6.simpleString())
+
+    val test7 = (4 + (2 * x)) + (4 * x)
+
+    println(test7.simpleString())
+
+    val test8 = ((x pow 2) + (x pow 3)) * 4
+
+    println(test8.simpleString())
 }
