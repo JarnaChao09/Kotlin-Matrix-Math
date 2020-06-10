@@ -8,6 +8,7 @@ import vector.IntVector
 import vector.Vector
 import java.lang.IllegalArgumentException
 import java.util.stream.DoubleStream
+import kotlin.math.absoluteValue
 import kotlin.reflect.KClass
 
 class DoubleMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Double): NumberMatrix<Double>(dim, initBlock) {
@@ -235,7 +236,56 @@ class DoubleMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Double): NumberMatr
     }
 
     override fun inverse(): DoubleMatrix {
-        TODO("Not yet implemented")
+        val src = DoubleMatrix(this)
+        val last = this.rowLength - 1
+        val a = src.toArray()
+
+        for (k in 0..last) {
+            var i = k
+            var akk = a[k][k].absoluteValue
+            for (j in (k+1)..last) {
+                val v = a[j][k].absoluteValue
+                if (v > akk) {
+                    i = j
+                    akk = v
+                }
+            }
+            if (akk == 0.0) throw Error.NotRegular()
+            if (i != k) {
+                val temp1 = a[i]
+                a[i] = a[k]
+                a[k] = temp1
+
+                val temp2 = this.internalMatrix[i]
+                this.internalMatrix[i] = this.internalMatrix[k]
+                this.internalMatrix[k] = temp2
+            }
+            akk = a[k][k]
+
+            for (ii in 0..last) {
+                if (ii == k) {
+                    continue
+                }
+                val q = a[ii][k] / akk
+                a[ii][k] = 0.0
+
+                for (j in (k+1)..last) {
+                    a[ii][j] = a[ii][j] - a[k][j] * q
+                }
+
+                for (j in 0..last) {
+                    this.internalMatrix[ii][j] = this.internalMatrix[ii][j] - this.internalMatrix[k][j] * q
+                }
+            }
+            
+            for (j in (k+1)..last) {
+                a[k][j] = a[k][j] / akk
+            }
+            for (j in 0..last) {
+                this.internalMatrix[k][j] = this.internalMatrix[k][j] / akk
+            }
+        }
+        return this
     }
 
     override fun determinant(): Double {

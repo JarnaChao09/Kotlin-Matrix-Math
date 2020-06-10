@@ -1,3 +1,5 @@
+package matrix
+
 import matrix.*
 import utils.*
 import vector.*
@@ -283,4 +285,8 @@ fun main() {
     val test = IntMatrix.of(2 by 2, 7, 6, 3, 9)
 
     println(test.rank())
+
+    println(DoubleMatrix.of(2 by 2, 7.0, 6.0, 3.0, 9.0).rank())
+
+    println(test.toDoubleMatrix().inverse())
 }
