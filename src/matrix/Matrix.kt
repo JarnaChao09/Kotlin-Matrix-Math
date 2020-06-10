@@ -147,7 +147,7 @@ open class Matrix<T>(val dim: Size = Size(3, 3), val initBlock: (r: Int, c: Int)
     val stream
         get() = this.stream()
 
-    override fun toVector(): Vector<Vector<T>> = this.internalMatrix
+    override fun toVector(): Vector<Vector<T>> = Vector(this.internalMatrix)
 
     override fun toList(): List<List<T>> {
         val ret = MutableList(this.size.x) { emptyList<T>() }

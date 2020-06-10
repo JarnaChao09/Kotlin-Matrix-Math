@@ -11,6 +11,8 @@ open class Vector<T>(length: Int = 10, initBlock: (Int) -> T): VectorBase<T> whe
 
     constructor(list: List<T>): this(length = list.size, initBlock = { i -> list[i] })
 
+    constructor(vec: Vector<T>): this(length = vec.length, initBlock = { i -> vec[i] })
+
     sealed class Scope<T> where T: Any {
         val actions: MutableList<Scope<T>> = emptyList<Scope<T>>().toMutableList()
 
