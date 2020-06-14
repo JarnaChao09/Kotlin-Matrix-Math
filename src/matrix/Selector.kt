@@ -1,11 +1,27 @@
 package matrix
 
 enum class Selector {
-    ALL,
-    DIAGONAL,
-    OFF_DIAGONAL,
-    LOWER,
-    STRICT_LOWER,
-    STRICT_UPPER,
-    UPPER
+    ALL {
+        override fun check(i: Int, j: Int): Boolean = true
+    },
+    DIAGONAL {
+        override fun check(i: Int, j: Int): Boolean = i == j
+    },
+    OFF_DIAGONAL {
+        override fun check(i: Int, j: Int): Boolean = i != j
+    },
+    LOWER {
+        override fun check(i: Int, j: Int): Boolean = i <= j
+    },
+    STRICT_LOWER {
+        override fun check(i: Int, j: Int): Boolean = i < j
+    },
+    STRICT_UPPER {
+        override fun check(i: Int, j: Int): Boolean = i > j
+    },
+    UPPER {
+        override fun check(i: Int, j: Int): Boolean = i >= j
+    };
+
+    abstract fun check(i: Int, j: Int): Boolean
 }

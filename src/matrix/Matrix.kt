@@ -164,7 +164,7 @@ open class Matrix<T>(val dim: Size = Size(3, 3), val initBlock: (r: Int, c: Int)
         get() = MatrixIteratorWithIndex(this)
 
     override operator fun get(index: Int): Vector<T> =
-        internalMatrix[index]
+        Vector(internalMatrix[index])
 
     override operator fun get(indexSlice: Slice): Matrix<T> =
         Matrix(internalMatrix[indexSlice] as Vector<Vector<T>>)

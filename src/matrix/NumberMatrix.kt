@@ -16,12 +16,15 @@ abstract class NumberMatrix<T>(dim: Size, initBlock: (r: Int, c: Int) -> T): Mat
 
     constructor(vector: Vector<T>): this(dim = Size(1, vector.length), initBlock = { _, i -> vector[i]  })
 
-    constructor(matListOfVector: Vector<Vector<T>>, unused: Int = 0): this(
-        dim = Size(matListOfVector.length, matListOfVector[0].length),
+    constructor(matListOfVector: Vector<Vector<T>>, unused: Boolean = true): this(
+        dim = if (unused) Size(matListOfVector.length, matListOfVector[0].length) else Size(matListOfVector.length, matListOfVector[0].length),
         initBlock = { r, c -> matListOfVector[r][c] }
     )
 
-    constructor(dim1: Size, emptyOrSingle: Boolean, initBlock: (Int) -> T): this(dim = dim1, initBlock = { _, i -> initBlock(i)})
+    constructor(dim1: Size, emptyOrSingle: Boolean, initBlock: (Int) -> T): this(dim = if (emptyOrSingle) dim1 else dim1, initBlock = { _, i -> initBlock(i)})
+
+    val inv: NumberMatrix<T>
+        get() = this.inverse()
 
     abstract operator fun plus(other: NumberMatrix<T>): NumberMatrix<T>
 

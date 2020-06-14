@@ -281,12 +281,24 @@ fun main() {
 //        !12
 //        !13
 //    })
+//
+//    val test = IntMatrix.of(2 by 2, 7, 6, 3, 9)
+//
+//    println(test.rank())
+//
+//    println(DoubleMatrix.of(2 by 2, 7.0, 6.0, 3.0, 9.0).rank())
+//
+//    println(test.toDoubleMatrix().inv)
+//
+//    val test1 = IntMatrix(3 by 3) { i, j -> 3 * i + j + 1 }
+//
+//    println(test1)
+//
+//    val temp = test1[0]
+//    test1[0] = test1[2]
+//    test1[2] = temp
+//
+//    println(test)
 
-    val test = IntMatrix.of(2 by 2, 7, 6, 3, 9)
-
-    println(test.rank())
-
-    println(DoubleMatrix.of(2 by 2, 7.0, 6.0, 3.0, 9.0).rank())
-
-    println(test.toDoubleMatrix().inverse())
+    DoubleMatrix.of(3 by 3, 1, 2, 3, 4, 5, 6, 7, 8, 9).forEach(Selector.DIAGONAL) { println(it) }
 }

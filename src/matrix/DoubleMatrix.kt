@@ -240,6 +240,8 @@ class DoubleMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Double): NumberMatr
         val last = this.rowLength - 1
         val a = src.toArray()
 
+        val identity = identity(this.rowLength)
+
         for (k in 0..last) {
             var i = k
             var akk = a[k][k].absoluteValue
@@ -256,9 +258,9 @@ class DoubleMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Double): NumberMatr
                 a[i] = a[k]
                 a[k] = temp1
 
-                val temp2 = this.internalMatrix[i]
-                this.internalMatrix[i] = this.internalMatrix[k]
-                this.internalMatrix[k] = temp2
+                val temp2 = identity[i]
+                identity[i] = identity[k]
+                identity[k] = temp2
             }
             akk = a[k][k]
 
@@ -270,11 +272,11 @@ class DoubleMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Double): NumberMatr
                 a[ii][k] = 0.0
 
                 for (j in (k+1)..last) {
-                    a[ii][j] = a[ii][j] - a[k][j] * q
+                    a[ii][j] = a[ii][j] - (a[k][j] * q)
                 }
 
                 for (j in 0..last) {
-                    this.internalMatrix[ii][j] = this.internalMatrix[ii][j] - this.internalMatrix[k][j] * q
+                    identity[ii, j] = identity[ii, j] - (identity[k, j] * q)
                 }
             }
             
@@ -282,10 +284,10 @@ class DoubleMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Double): NumberMatr
                 a[k][j] = a[k][j] / akk
             }
             for (j in 0..last) {
-                this.internalMatrix[k][j] = this.internalMatrix[k][j] / akk
+                identity[k, j] = identity[k, j] / akk
             }
         }
-        return this
+        return identity
     }
 
     override fun determinant(): Double {
@@ -322,7 +324,6 @@ class DoubleMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Double): NumberMatr
         return ret
     }
 
-    override fun matDiv(other: NumberMatrix<Double>): DoubleMatrix {
-        TODO("Not yet implemented")
-    }
+    override fun matDiv(other: NumberMatrix<Double>): DoubleMatrix =
+        this * other.inv
 }
