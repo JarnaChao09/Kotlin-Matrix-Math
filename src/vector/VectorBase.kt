@@ -21,6 +21,10 @@ interface VectorBase<T>: Iterable<T> where T: Any {
 
     fun put(other: T, at: Int)
 
+    fun remove(other: T): Boolean
+
+    fun removeAt(index: Int): T
+
     infix fun appendAll(value: VectorBase<T>)
 
     override fun equals(other: Any?): Boolean

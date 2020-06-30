@@ -104,6 +104,12 @@ open class Vector<T>(length: Int = 10, initBlock: (Int) -> T): VectorBase<T> whe
         this._arr.add(at, other)
     }
 
+    override fun remove(other: T): Boolean =
+        this._arr.remove(other)
+
+    override fun removeAt(index: Int): T =
+        this._arr.removeAt(index)
+
     protected var _arr: MutableList<T> = List(length) { i -> initBlock(i) }.toMutableList()
 
     override val length: Int

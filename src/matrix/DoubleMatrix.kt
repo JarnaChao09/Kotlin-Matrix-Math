@@ -59,10 +59,10 @@ class DoubleMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Double): NumberMatr
         fun identity(n: Int): DoubleMatrix = DoubleMatrix(n by n) { r, c -> if (r == c) 1.0 else 0.0 }
 
         @JvmStatic
-        fun diagonal(vararg elements: Double): DoubleMatrix = DoubleMatrix(elements.size by elements.size) { r, c -> if (r == c) elements[r] else 0.0 }
+        fun diagonal(vararg elements: Number): DoubleMatrix = DoubleMatrix(elements.size by elements.size) { r, c -> if (r == c) elements[r].toDouble() else 0.0 }
 
         @JvmStatic
-        fun scalar(n: Int, value: Double): DoubleMatrix = diagonal(*DoubleArray(n) { value })
+        fun scalar(n: Int, value: Double): DoubleMatrix = diagonal(*Array(n) { value })
 
         @JvmStatic
         @JvmName("ofDoubles")
@@ -113,7 +113,10 @@ class DoubleMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Double): NumberMatr
     val doubleStream: DoubleStream
         get() = this.stream.mapToDouble { x -> x }
 
-    val array: Array<DoubleArray>
+    val doubleVector: Vector<DoubleVector>
+        get() = Vector(this.rowLength) { r -> DoubleVector(this.colLength) { c -> this[r, c] } }
+
+    val doubleArray: Array<DoubleArray>
         get() {
             val ret = Array(this.toArray().size) { DoubleArray(this.toArray()[0].size) }
             var index = 0
@@ -303,7 +306,17 @@ class DoubleMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Double): NumberMatr
     }
 
     override fun firstMinor(row: Int, col: Int): DoubleMatrix {
-        TODO("Not yet implemented")
+        if (this.isEmpty()) throw RuntimeException("First Minor of Empty Matrix is not defined")
+
+        if (row !in 0 until rowLength) throw IllegalArgumentException("Invalid row $row for 0..${rowLength - 1}")
+
+        if (col !in 0 until colLength) throw IllegalArgumentException("Invalid col $col for 0..${colLength - 1}")
+
+        val vectors = this.doubleVector
+        vectors.removeAt(row)
+        vectors.forEach { it.removeAt(col) }
+
+        return DoubleMatrix(vectors)
     }
 
     override fun laplaceExpansion(row: Int, col: Int): Double {

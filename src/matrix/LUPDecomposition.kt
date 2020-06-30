@@ -9,7 +9,7 @@ import kotlin.math.abs
 class LUPDecomposition(matrix: DoubleMatrix) {
     constructor(matrix: IntMatrix): this(matrix.toDoubleMatrix())
 
-    val lu: Array<DoubleArray> = matrix.array
+    val lu: Array<DoubleArray> = matrix.doubleArray
 
     val rowCount: Int = matrix.size.x
 

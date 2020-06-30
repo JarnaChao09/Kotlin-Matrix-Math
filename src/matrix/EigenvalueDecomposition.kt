@@ -21,12 +21,12 @@ class EigenvalueDecomposition(matrix: DoubleMatrix) {
 
     init {
         if (symmetric) {
-            v = matrix.array
+            v = matrix.doubleArray
             tridiagonalize()
             diagonalize()
         } else {
             v = Array(size) { DoubleArray(size) }
-            h = matrix.array
+            h = matrix.doubleArray
             reduceToHessenberg()
             hessenbergToRealSchur()
         }

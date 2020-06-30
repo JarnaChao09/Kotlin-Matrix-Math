@@ -65,10 +65,10 @@ class IntMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Int): NumberMatrix<Int
         fun identity(n: Int): IntMatrix = IntMatrix(n by n) { r, c -> if (r == c) 1 else 0 }
 
         @JvmStatic
-        fun diagonal(vararg elements: Int): IntMatrix = IntMatrix(elements.size by elements.size) { r, c -> if (r == c) elements[r] else 0 }
+        fun diagonal(vararg elements: Number): IntMatrix = IntMatrix(elements.size by elements.size) { r, c -> if (r == c) elements[r].toInt() else 0 }
 
         @JvmStatic
-        fun scalar(n: Int, value: Int): IntMatrix = diagonal(*IntArray(n) { value })
+        fun scalar(n: Int, value: Int): IntMatrix = diagonal(*Array(n) { value })
 
         @JvmStatic
         @JvmName("ofInts")
@@ -119,7 +119,11 @@ class IntMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Int): NumberMatrix<Int
     val intStream: IntStream
         get() = this.stream.mapToInt { x -> x }
 
-    val array: Array<IntArray>
+    val intVector: Vector<IntVector>
+        get() =
+            Vector(this.rowLength) { r -> IntVector(this.colLength) { c -> this[r, c] } }
+
+    val intArray: Array<IntArray>
         get() {
             val ret = Array(this.toArray().size) { IntArray(this.toArray()[0].size) }
             var index = 0
@@ -313,7 +317,17 @@ class IntMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Int): NumberMatrix<Int
     }
 
     override fun firstMinor(row: Int, col: Int): IntMatrix {
-        TODO("Not yet implemented")
+        if (this.isEmpty()) throw RuntimeException("First Minor of Empty Matrix is not defined")
+
+        if (row !in 0 until rowLength) throw IllegalArgumentException("Invalid row $row for 0..${rowLength - 1}")
+
+        if (col !in 0 until colLength) throw IllegalArgumentException("Invalid col $col for 0..${colLength - 1}")
+
+        val vectors = this.intVector
+        vectors.removeAt(row)
+        vectors.forEach { it.removeAt(col) }
+
+        return IntMatrix(vectors)
     }
 
     override fun laplaceExpansion(row: Int, col: Int): Int {
