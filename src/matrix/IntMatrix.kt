@@ -240,18 +240,19 @@ class IntMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Int): NumberMatrix<Int
     }
 
     override fun dot(other: NumberMatrix<Int>): IntMatrix {
+        other as IntMatrix
         val ret = IntMatrix(this.dim.x, 1)
         for (i in 0 until this.rowLength) {
-            ret[i, 0] = (this.internalMatrix[i] as IntVector) dot (other.vector[i] as IntVector)
+            ret[i, 0] = this[i] dot other[i]
         }
         return ret
     }
 
     override fun cross(other: NumberMatrix<Int>): IntMatrix {
+        other as IntMatrix
         val ret = IntMatrix(this.dim.x, 1)
         for (i in 0 until this.dim.x) {
-            ret[i] =
-                (this.internalMatrix[i] as IntVector) cross (other.vector[i] as IntVector)
+            ret[i] = this[i] cross other[i]
         }
         return ret
     }

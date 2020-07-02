@@ -232,18 +232,19 @@ class DoubleMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Double): NumberMatr
     }
 
     override fun dot(other: NumberMatrix<Double>): DoubleMatrix {
+        other as DoubleMatrix
         val ret = DoubleMatrix(this.dim.x, 1)
         for (i in 0 until this.dim.x) {
-            ret[i, 0] = (this.internalMatrix[i] as DoubleVector) dot (other.vector[i] as DoubleVector)
+            ret[i, 0] = this[i] dot other[i]
         }
         return ret
     }
 
     override fun cross(other: NumberMatrix<Double>): DoubleMatrix {
+        other as DoubleMatrix
         val ret = DoubleMatrix(this.dim.x, 1)
         for (i in 0 until this.dim.x) {
-            ret[i] =
-                (this.internalMatrix[i] as DoubleVector) cross (other.vector[i] as DoubleVector)
+            ret[i] = this[i] cross other[i]
         }
         return ret
     }
