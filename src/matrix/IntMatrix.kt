@@ -144,81 +144,99 @@ class IntMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Int): NumberMatrix<Int
 
 
     override fun plus(other: NumberMatrix<Int>): IntMatrix {
+        other as IntMatrix
         val ret = empty(this.dim)
         for (i in 0 until ret.rowLength) {
-            ret[i] =
-                this.internalMatrix[i] as IntVector + other.vector[i] as IntVector
+            ret[i] = this[i] + other[i]
         }
         return ret
     }
 
     override fun minus(other: NumberMatrix<Int>): IntMatrix {
+        other as IntMatrix
         val ret = empty(this.dim)
         for (i in 0 until ret.rowLength) {
-            ret[i] =
-                this.internalMatrix[i] as IntVector - other.vector[i] as IntVector
+            ret[i] = this[i] - other[i]
         }
         return ret
     }
 
     override fun times(other: NumberMatrix<Int>): IntMatrix {
+        other as IntMatrix
         val ret = empty(this.dim)
         for (i in 0 until ret.rowLength) {
-            ret[i] =
-                this.internalMatrix[i] as IntVector * other.vector[i] as IntVector
+            ret[i] = this[i] * other[i]
         }
         return ret
     }
 
     override fun div(other: NumberMatrix<Int>): IntMatrix {
+        other as IntMatrix
         val ret = empty(this.dim)
         for (i in 0 until ret.rowLength) {
-            ret[i] =
-                this.internalMatrix[i] as IntVector / other.vector[i] as IntVector
+            ret[i] = this[i] / other[i]
         }
         return ret
     }
 
     override fun rem(other: NumberMatrix<Int>): IntMatrix {
+        other as IntMatrix
         val ret = empty(this.dim)
         for (i in 0 until ret.rowLength) {
-            ret[i] =
-                this.internalMatrix[i] as IntVector / other.vector[i] as IntVector
+            ret[i] = this[i] % other[i]
         }
         return ret
     }
 
     override fun pow(other: NumberMatrix<Int>): IntMatrix {
+        other as IntMatrix
         val ret = empty(this.dim)
         for (i in 0 until ret.rowLength) {
-            ret[i] =
-                this.internalMatrix[i] as IntVector pow other.vector[i] as IntVector
+            ret[i] = this[i] pow other[i]
         }
         return ret
     }
 
     override fun plusAssign(other: NumberMatrix<Int>) {
-        this.internalMatrix = (this + other).internalMatrix
+        other as IntMatrix
+        for (i in 0 until this.rowLength) {
+            this[i] = this[i] + other[i]
+        }
     }
 
     override fun minusAssign(other: NumberMatrix<Int>) {
-        this.internalMatrix = (this - other).internalMatrix
+        other as IntMatrix
+        for (i in 0 until this.rowLength) {
+            this[i] = this[i] - other[i]
+        }
     }
 
     override fun timesAssign(other: NumberMatrix<Int>) {
-        this.internalMatrix = (this * other).internalMatrix
+        other as IntMatrix
+        for (i in 0 until this.rowLength) {
+            this[i] = this[i] * other[i]
+        }
     }
 
     override fun divAssign(other: NumberMatrix<Int>) {
-        this.internalMatrix = (this / other).internalMatrix
+        other as IntMatrix
+        for (i in 0 until this.rowLength) {
+            this[i] = this[i] / other[i]
+        }
     }
 
     override fun remAssign(other: NumberMatrix<Int>) {
-        this.internalMatrix = (this % other).internalMatrix
+        other as IntMatrix
+        for (i in 0 until this.rowLength) {
+            this[i] = this[i] % other[i]
+        }
     }
 
     override fun powAssign(other: NumberMatrix<Int>) {
-        this.internalMatrix = this.pow(other).vector
+        other as IntMatrix
+        for (i in 0 until this.rowLength) {
+            this[i] = this[i] pow other[i]
+        }
     }
 
     override fun dot(other: NumberMatrix<Int>): IntMatrix {

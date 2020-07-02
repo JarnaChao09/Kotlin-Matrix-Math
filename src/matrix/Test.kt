@@ -301,7 +301,17 @@ fun main() {
 //    println(test)
 //
 //    DoubleMatrix.of(3 by 3, 1, 2, 3, 4, 5, 6, 7, 8, 9).forEach(Selector.DIAGONAL) { println(it) }
+//
+//    println(IntMatrix.diagonal(9, 5, -3, 4).firstMinor(1, 2))
+//    println(DoubleMatrix.diagonal(9.0, 5.0, -3.0, 4.0).firstMinor(1, 2))
 
-    println(IntMatrix.diagonal(9, 5, -3, 4).firstMinor(1, 2))
-    println(DoubleMatrix.diagonal(9.0, 5.0, -3.0, 4.0).firstMinor(1, 2))
+    val test = IntMatrix.ones(3 by 3)
+
+    println(test)
+
+    test += IntMatrix.ones(3 by 3)
+
+    println(test)
+
+    println(test + IntMatrix.ones(3 by 3))
 }
