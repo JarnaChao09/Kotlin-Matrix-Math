@@ -55,7 +55,7 @@ interface MatrixBase<T>: Iterable<T> where T: Any {
 
     fun colAppend(other: MatrixBase<T>): MatrixBase<T>
 
-    fun toVector(): Vector<Vector<T>>
+    fun toVector(): Vector<out Vector<T>>
 
     fun toList(): List<List<T>>
 }

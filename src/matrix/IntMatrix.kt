@@ -114,14 +114,25 @@ class IntMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Int): NumberMatrix<Int
     override var internalMatrix: Vector<Vector<Int>> =
         Vector(dim.x) { i -> IntVector(dim.y) { j -> initBlock(i, j) } }
 
+    override val inv: IntMatrix
+        get() = this.inverse()
+
+    override val t: IntMatrix
+        get() = this.transpose()
+
+    override fun transpose(): IntMatrix =
+        super.transpose() as IntMatrix
+
     override val type: KClass<Int> by lazy { Int::class }
 
     val intStream: IntStream
         get() = this.stream.mapToInt { x -> x }
 
-    val intVector: Vector<IntVector>
-        get() =
-            Vector(this.rowLength) { r -> IntVector(this.colLength) { c -> this[r, c] } }
+    override val vector: Vector<IntVector>
+        get() = this.toVector()
+
+    override fun toVector(): Vector<IntVector> =
+        Vector(this.rowLength) { r -> IntVector(this.colLength) { c -> this[r, c] } }
 
     val intArray: Array<IntArray>
         get() {
@@ -342,7 +353,7 @@ class IntMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Int): NumberMatrix<Int
 
         if (col !in 0 until colLength) throw IllegalArgumentException("Invalid col $col for 0..${colLength - 1}")
 
-        val vectors = this.intVector
+        val vectors = this.vector
         vectors.removeAt(row)
         vectors.forEach { it.removeAt(col) }
 
@@ -357,11 +368,12 @@ class IntMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Int): NumberMatrix<Int
         get() = LUPDecomposition(this.toDoubleMatrix())
 
     override fun matMul(other: NumberMatrix<Int>): IntMatrix {
+        other as IntMatrix
         if (this.dim.y != other.dim.x) throw IllegalArgumentException("${this.dim} is not compatible with ${other.dim}")
         val ret = zeros(this.dim.x by other.dim.y)
         for (i in 0 until ret.rowLength) {
             for (j in 0 until ret.colLength) {
-                ret[i, j] = this[i] dot IntVector(other.rowLength) { k -> other.t[j][k] }
+                ret[i, j] = this[i] dot IntVector(other.rowLength) { k -> other.t[j, k] }
             }
         }
         return ret

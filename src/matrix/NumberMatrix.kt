@@ -23,7 +23,7 @@ abstract class NumberMatrix<T>(dim: Size, initBlock: (r: Int, c: Int) -> T): Mat
 
     constructor(dim1: Size, emptyOrSingle: Boolean, initBlock: (Int) -> T): this(dim = if (emptyOrSingle) dim1 else dim1, initBlock = { _, i -> initBlock(i)})
 
-    val inv: NumberMatrix<T>
+    open val inv: NumberMatrix<T>
         get() = this.inverse()
 
     abstract operator fun plus(other: NumberMatrix<T>): NumberMatrix<T>

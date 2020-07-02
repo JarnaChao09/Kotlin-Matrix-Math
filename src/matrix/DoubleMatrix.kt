@@ -108,13 +108,25 @@ class DoubleMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Double): NumberMatr
     override var internalMatrix: Vector<Vector<Double>> =
         Vector(dim.x) { i -> DoubleVector(dim.y) { j -> initBlock(i, j) } }
 
+    override val inv: DoubleMatrix
+        get() = this.inverse()
+
+    override val t: DoubleMatrix
+        get() = this.transpose()
+
+    override fun transpose(): DoubleMatrix =
+        super.transpose() as DoubleMatrix
+
     override val type: KClass<Double> by lazy { Double::class }
 
     val doubleStream: DoubleStream
         get() = this.stream.mapToDouble { x -> x }
 
-    val doubleVector: Vector<DoubleVector>
-        get() = Vector(this.rowLength) { r -> DoubleVector(this.colLength) { c -> this[r, c] } }
+    override val vector: Vector<DoubleVector>
+        get() = this.toVector()
+
+    override fun toVector(): Vector<DoubleVector> =
+        Vector(this.rowLength) { r -> DoubleVector(this.colLength) { c -> this[r, c] } }
 
     val doubleArray: Array<DoubleArray>
         get() {
@@ -331,7 +343,7 @@ class DoubleMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Double): NumberMatr
 
         if (col !in 0 until colLength) throw IllegalArgumentException("Invalid col $col for 0..${colLength - 1}")
 
-        val vectors = this.doubleVector
+        val vectors = this.vector
         vectors.removeAt(row)
         vectors.forEach { it.removeAt(col) }
 

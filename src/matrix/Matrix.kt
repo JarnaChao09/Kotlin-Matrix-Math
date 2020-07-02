@@ -135,19 +135,19 @@ open class Matrix<T>(val dim: Size = Size(3, 3), val initBlock: (r: Int, c: Int)
     override val colLength
         get() = size.y
 
-    val t
+    open val t: Matrix<T>
         get() = this.transpose()
 
-    val vector
+    open val vector: Vector<out Vector<T>>
         get() = this.toVector()
 
-    val list
+    open val list: List<List<T>>
         get() = this.toList()
 
-    val stream
+    open val stream
         get() = this.stream()
 
-    override fun toVector(): Vector<Vector<T>> = Vector(this.internalMatrix)
+    override fun toVector(): Vector<out Vector<T>> = Vector(this.internalMatrix)
 
     override fun toList(): List<List<T>> {
         val ret = MutableList(this.size.x) { emptyList<T>() }

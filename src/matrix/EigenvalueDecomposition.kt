@@ -1,5 +1,6 @@
 package matrix
 
+import complex.Complex
 import kotlin.math.*
 
 class EigenvalueDecomposition(matrix: DoubleMatrix) {
@@ -35,8 +36,19 @@ class EigenvalueDecomposition(matrix: DoubleMatrix) {
     fun eigenvectorMatrix(): DoubleMatrix =
         DoubleMatrix(buildEigenvectors().t)
 
-    fun eigenvalues(): DoubleArray {
-        TODO("Not yet implemented")
+    fun eigenvectorMatrixInv(): DoubleMatrix {
+        var r = DoubleMatrix(buildEigenvectors())
+        if (!symmetric) {
+            r = r.t.inv
+        }
+        return r
+    }
+
+    /**after ComplexArray creation, change return type**/
+    fun eigenvalues(): Array<Complex> {
+        val values = Array(d.size) { i -> Complex(d[i]) }
+        e.forEachIndexed { i, imag -> values[i] = if (imag != 0.0) Complex(values[i], imag) else values[i] }
+        return values
     }
 
     fun eigenvalueMatrix(): DoubleMatrix {
@@ -146,7 +158,98 @@ class EigenvalueDecomposition(matrix: DoubleMatrix) {
     }
 
     private fun diagonalize() {
-        TODO("Not yet implemented")
+        for (i in 1 until size) {
+            e[i - 1] = e[i]
+        }
+        e[size - 1] = 0.0
+
+        var f = 0.0
+        var tst1 = 0.0
+        var eps = 2.2204460492503131e-16
+
+        for (l in 0 until size) {
+            tst1 = max(tst1, d[l].absoluteValue + e[l].absoluteValue)
+            var m = l
+            while (m < size) {
+                if (e[m].absoluteValue <= eps*tst1) {
+                    break
+                }
+                m += 1
+            }
+
+            if (m > l) {
+                var iter = 0
+                do {
+                    iter += 1
+
+                    var g = d[l]
+                    var p = (d[l + 1] - g) / (2.0 * e[l])
+                    var r = hypot(p, 1.0)
+                    if (p < 0.0) {
+                        r = -r
+                    }
+                    d[l] = e[l] / (p + r)
+                    d[l + 1] = e[l] * (p + r)
+                    var dl1 = d[l + 1]
+                    var h_ = g - d[l]
+                    for (i in (l + 2) until size) {
+                        d[i] -= h_
+                    }
+                    f += h_
+
+                    p = d[m]
+                    var c = 1.0
+                    var c2 = c
+                    var c3 = c
+                    var el1 = e[l + 1]
+                    var s = 0.0
+                    var s2 = 0.0
+                    for (i in (m - 1) downTo l) {
+                        c3 = c2
+                        c2 = c
+                        s2 = s
+                        g = c * e[i]
+                        h_ = c * p
+                        r = hypot(p, e[i])
+                        e[i + 1] = s * r
+                        s = e[i] / r
+                        c = p / r
+                        p = c * d[i] - s * g
+                        d[i + 1] = h_ + s * (c * g + s * d[i])
+
+                        for (k in 0 until size) {
+                            h_ = v[k][i + 1]
+                            v[k][i + 1] = s * v[k][i] + c * h_
+                            v[k][i] = c * v[k][i] - s * h_
+                        }
+                    }
+                    p = -s * s2 * c3 * el1 * e[l] / dl1
+                    e[l] = s * p
+                    d[l] = c * p
+                } while (e[l].absoluteValue > eps * tst1)
+            }
+            d[l] = d[l] + f
+            e[l] = 0.0
+        }
+        for (i in 0..(size - 2)) {
+            var k = i
+            var p = d[i]
+            for (j in (i + 1) until size) {
+                if (d[j] < p) {
+                    k = j
+                    p = d[j]
+                }
+            }
+            if (k != i) {
+                d[k] = d[i]
+                d[i] = p
+                for (j in 0 until size) {
+                    p = v[j][i]
+                    v[j][i] = v[j][k]
+                    v[j][k] = p
+                }
+            }
+        }
     }
 
     private fun reduceToHessenberg() {
