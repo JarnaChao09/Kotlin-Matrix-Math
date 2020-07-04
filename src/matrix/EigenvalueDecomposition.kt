@@ -1,6 +1,7 @@
 package matrix
 
 import complex.Complex
+import vector.Vector
 import kotlin.math.*
 
 class EigenvalueDecomposition(matrix: DoubleMatrix) {
@@ -44,9 +45,9 @@ class EigenvalueDecomposition(matrix: DoubleMatrix) {
         return r
     }
 
-    /**after ComplexArray creation, change return type**/
-    fun eigenvalues(): Array<Complex> {
-        val values = Array(d.size) { i -> Complex(d[i]) }
+    /**after ComplexVector creation, change return type**/
+    fun eigenvalues(): Vector<Complex> {
+        val values = Vector(d.size) { i -> Complex(d[i]) }
         e.forEachIndexed { i, imag -> values[i] = if (imag != 0.0) Complex(values[i], imag) else values[i] }
         return values
     }
