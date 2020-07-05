@@ -50,6 +50,8 @@ sealed class Fun(
     fun simpleString(): String = this.simplify().stringify()
 
     abstract fun sub(replace: Variable, with: Fun): Fun
+
+    abstract fun copy(): Fun
 }
 
 data class Constant(val value: Double): Fun() {
@@ -70,6 +72,8 @@ data class Constant(val value: Double): Fun() {
     override fun toString(): String = "Constant(${this.value})"
 
     override fun sub(replace: Variable, with: Fun): Fun = this
+
+    override fun copy(): Fun = Constant(this.value)
 }
 
 data class Variable(val name: String): Fun() {
@@ -107,6 +111,8 @@ data class Variable(val name: String): Fun() {
 
     override fun sub(replace: Variable, with: Fun): Fun =
         if (this == replace) with else this
+
+    override fun copy(): Fun = Variable(this.name)
 }
 
 data class Sum(val a: Fun, val b: Fun): Fun() {
@@ -131,7 +137,7 @@ data class Sum(val a: Fun, val b: Fun): Fun() {
 //                }
 //            }
 
-            a_ is Sum && b_ !is Sum -> {
+            a_ is Sum -> {
                 when(b_) {
                     is Product -> {
                         when {
@@ -165,7 +171,43 @@ data class Sum(val a: Fun, val b: Fun): Fun() {
                         }
                     }
                     is Power -> {
-                        TODO()
+                        val a_a_ = a_.a.simplify()
+                        val a_b_ = a_.b.simplify()
+                        when {
+                            a_a_ is Product -> {
+                                val a_a_a_ = a_a_.a.simplify()
+                                val a_a_b_ = a_a_.b.simplify()
+                                when {
+                                    a_a_a_ == b_ -> {
+                                        ((a_a_b_ + 1).simplify() * b_) + a_b_
+                                    }
+                                    a_a_b_ == b_ -> {
+                                        ((a_a_a_ + 1).simplify() * b_) + a_b_
+                                    }
+                                    else -> {
+                                        a_ + b_
+                                    }
+                                }
+                            }
+                            a_b_ is Product -> {
+                                val a_b_a_ = a_b_.a.simplify()
+                                val a_b_b_ = a_b_.b.simplify()
+                                when {
+                                    a_b_a_ == b_ -> {
+                                        ((a_b_b_ + 1).simplify() * b_) + a_a_
+                                    }
+                                    a_b_b_ == b_ -> {
+                                        ((a_b_a_ + 1).simplify() * b_) + a_a_
+                                    }
+                                    else -> {
+                                        a_ + b_
+                                    }
+                                }
+                            }
+                            else -> {
+                                a_ + b_
+                            }
+                        }
                     }
 //                    is Constant -> {
 //                        TODO()
@@ -206,6 +248,8 @@ data class Sum(val a: Fun, val b: Fun): Fun() {
     override fun toString(): String = "Sum(${this.a}, ${this.b})"
 
     override fun sub(replace: Variable, with: Fun): Fun = a.sub(replace, with) + b.sub(replace, with)
+
+    override fun copy(): Fun = Sum(this.a, this.b)
 }
 
 data class Product(val a: Fun, val b: Fun): Fun() {
@@ -339,6 +383,8 @@ data class Product(val a: Fun, val b: Fun): Fun() {
     override fun toString(): String = "Product(${this.a}, ${this.b})"
 
     override fun sub(replace: Variable, with: Fun): Fun = a.sub(replace, with) * b.sub(replace, with)
+
+    override fun copy(): Fun = Product(this.a, this.b)
 }
 
 data class Power(val base: Fun, val exponent: Fun): Fun() {
@@ -383,6 +429,8 @@ data class Power(val base: Fun, val exponent: Fun): Fun() {
     override fun toString(): String = "Power(${this.base}, ${this.exponent})"
 
     override fun sub(replace: Variable, with: Fun): Fun = base.sub(replace, with) pow exponent.sub(replace, with)
+
+    override fun copy(): Fun = Power(this.base, this.exponent)
 }
 
 data class Ln(val a: Fun): Fun() {
@@ -416,6 +464,8 @@ data class Ln(val a: Fun): Fun() {
     override fun toString(): String = "Ln(${this.a})"
 
     override fun sub(replace: Variable, with: Fun): Fun = Ln(a.sub(replace, with))
+
+    override fun copy(): Fun = Ln(this.a)
 }
 
 data class Sin(val a: Fun): Fun() {
@@ -437,6 +487,8 @@ data class Sin(val a: Fun): Fun() {
     override fun toString(): String = "Sin(${this.a})"
 
     override fun sub(replace: Variable, with: Fun): Fun = Sin(a.sub(replace, with))
+
+    override fun copy(): Fun = Sin(this.a)
 }
 
 data class Cos(val a: Fun): Fun() {
@@ -458,4 +510,6 @@ data class Cos(val a: Fun): Fun() {
     override fun toString(): String = "Cos(${this.a})"
 
     override fun sub(replace: Variable, with: Fun): Fun = Cos(a.sub(replace, with))
+
+    override fun copy(): Fun = Cos(this.a)
 }
