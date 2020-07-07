@@ -4,9 +4,9 @@ import complex.Complex
 import complex.complex
 import complex.conjugate
 import complex.times
+import matrix.decomp.LUPDecomposition
 import utils.Size
 import vector.Vector
-import kotlin.math.absoluteValue
 
 abstract class NumberMatrix<T>(dim: Size, initBlock: (r: Int, c: Int) -> T): Matrix<T>(dim = dim, initBlock = initBlock) where T: Number {
     constructor(x: Int, y: Int, initBlock: (Int) -> T): this(dim = Size(
@@ -104,6 +104,10 @@ abstract class NumberMatrix<T>(dim: Size, initBlock: (r: Int, c: Int) -> T): Mat
     abstract fun laplaceExpansion(row: Int = -1, col: Int = -1): T
 
     abstract fun toArray(): Array<Array<T>>
+
+    abstract fun toIntMatrix(): IntMatrix
+
+    abstract fun toDoubleMatrix(): DoubleMatrix
 
     abstract val lup: LUPDecomposition
 

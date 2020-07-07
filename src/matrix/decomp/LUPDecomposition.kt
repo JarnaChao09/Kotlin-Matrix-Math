@@ -1,5 +1,8 @@
-package matrix
+package matrix.decomp
 
+import matrix.DoubleMatrix
+import matrix.IntMatrix
+import matrix.Matrix
 import utils.by
 import vector.DoubleVector
 
@@ -137,8 +140,8 @@ class LUPDecomposition(matrix: DoubleMatrix) {
     operator fun component3(): DoubleMatrix = p
 
     private fun l(): DoubleMatrix =
-        DoubleMatrix(this.rowCount by min(this.rowCount, this.colCount)) {
-            r, c -> when {
+        DoubleMatrix(this.rowCount by min(this.rowCount, this.colCount)) { r, c ->
+            when {
                 r > c -> this.lu[r][c]
                 r == c -> 1.0
                 else -> 0.0
@@ -146,8 +149,8 @@ class LUPDecomposition(matrix: DoubleMatrix) {
         }
 
     private fun u(): DoubleMatrix =
-        DoubleMatrix(min(this.rowCount, this.colCount) by this.colCount) {
-            r, c -> when {
+        DoubleMatrix(min(this.rowCount, this.colCount) by this.colCount) { r, c ->
+            when {
                 r <= c -> this.lu[r][c]
                 else -> 0.0
             }

@@ -34,4 +34,8 @@ abstract class NumberVector<T>(length: Int = 10, initBlock: (Int) -> T): Vector<
     abstract infix fun cross(other: NumberVector<T>): NumberVector<T>
 
     abstract fun toArray(): Array<T>
+
+    abstract fun toIntVector(): IntVector
+
+    abstract fun toDoubleVector(): DoubleVector
 }

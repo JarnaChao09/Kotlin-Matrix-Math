@@ -1,10 +1,10 @@
 package matrix
 
+import matrix.decomp.LUPDecomposition
 import utils.Size
 import utils.Slice
 import utils.by
 import vector.DoubleVector
-import vector.IntVector
 import vector.Vector
 import java.lang.IllegalArgumentException
 import java.util.stream.DoubleStream
@@ -147,6 +147,12 @@ class DoubleMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Double): NumberMatr
         return ret.toTypedArray()
     }
 
+    override fun toIntMatrix(): IntMatrix =
+        IntMatrix(this.size) { r, c -> this[r, c].toInt() }
+
+    override fun toDoubleMatrix(): DoubleMatrix =
+        DoubleMatrix(this)
+
     override fun plus(other: NumberMatrix<Double>): DoubleMatrix {
         other as DoubleMatrix
         val ret = empty(this.dim)
@@ -272,7 +278,7 @@ class DoubleMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Double): NumberMatr
     override fun inverse(): DoubleMatrix {
         val src = DoubleMatrix(this)
         val last = this.rowLength - 1
-        val a = src.toArray()
+        val a = src.doubleArray
 
         val identity = identity(this.rowLength)
 

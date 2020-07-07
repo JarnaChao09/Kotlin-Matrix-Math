@@ -213,9 +213,6 @@ class IntVector(length: Int = 10, initBlock: (Int) -> Int = { 0 }): NumberVector
     operator fun rem(other: Double): DoubleVector =
         DoubleVector(this.length) { i -> this[i] % other }
 
-    fun toDoubleVector(): DoubleVector =
-        DoubleVector(this.length) { i -> this[i].toDouble() }
-
     override fun forEach(action: (Int) -> Unit) {
         for (i in this) {
             action(i)
@@ -247,9 +244,12 @@ class IntVector(length: Int = 10, initBlock: (Int) -> Int = { 0 }): NumberVector
         return ret
     }
 
-    override fun toMatrix(asCol: Boolean): IntMatrix {
-        return IntMatrix(this, asCol)
-    }
+    override fun toMatrix(asCol: Boolean): IntMatrix = IntMatrix(this, asCol)
 
     override fun toArray(): Array<Int> = this.toList().toTypedArray()
+
+    override fun toIntVector(): IntVector = IntVector(this)
+
+    override fun toDoubleVector(): DoubleVector =
+        DoubleVector(this.length) { i -> this[i].toDouble() }
 }

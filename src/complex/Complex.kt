@@ -7,7 +7,7 @@ import kotlin.math.*
 
 import java.util.stream.IntStream
 
-data class Complex(var real: Double, var imag: Double) {
+data class Complex(var real: Double, var imag: Double): Number() {
     constructor(real: Number, imag: Number): this(real.toDouble(), imag.toDouble())
 
     constructor(real: Number, imag: Complex): this(real.toDouble() - imag.imag, imag.real)
@@ -17,6 +17,20 @@ data class Complex(var real: Double, var imag: Double) {
     constructor(real: Number): this(real.toDouble(), 0.0)
 
     constructor(copy: Complex): this(copy.real, copy.imag)
+
+    override fun toByte(): Byte = radius.toByte()
+
+    override fun toChar(): Char = radius.toChar()
+
+    override fun toDouble(): Double = radius
+
+    override fun toFloat(): Float = radius.toFloat()
+
+    override fun toInt(): Int = radius.toInt()
+
+    override fun toLong(): Long = radius.toLong()
+
+    override fun toShort(): Short = radius.toShort()
 
     companion object {
         val ZERO
@@ -32,9 +46,11 @@ data class Complex(var real: Double, var imag: Double) {
     val conjugate
         get() = Complex(real, -imag)
 
-    val radius = sqrt(real.pow(2) + imag.pow(2))
+    val radius
+        get() = hypot(real, imag)
 
-    val angle = atan2(imag, real)
+    val angle
+        get() = atan2(imag, real)
 
     val polar
         get() = PolarVector(radius = radius, angle = Angle.Radians(angle))

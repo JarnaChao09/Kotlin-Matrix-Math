@@ -1,6 +1,8 @@
-package matrix
+package matrix.decomp
 
 import complex.Complex
+import matrix.DoubleMatrix
+import matrix.NumberMatrix
 import vector.Vector
 import kotlin.math.*
 

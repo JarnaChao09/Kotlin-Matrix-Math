@@ -1,5 +1,6 @@
 package matrix
 
+import matrix.decomp.LUPDecomposition
 import utils.Size
 import utils.Slice
 import utils.by
@@ -268,7 +269,10 @@ class IntMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Int): NumberMatrix<Int
         return ret
     }
 
-    fun toDoubleMatrix(): DoubleMatrix =
+    override fun toIntMatrix(): IntMatrix =
+        IntMatrix(this)
+
+    override fun toDoubleMatrix(): DoubleMatrix =
         DoubleMatrix(this.size) { r, c -> this[r, c].toDouble() }
 
     override fun trace(): Int {
@@ -282,7 +286,7 @@ class IntMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Int): NumberMatrix<Int
     override fun inverse(): IntMatrix {
         val src = IntMatrix(this)
         val last = this.rowLength - 1
-        val a = src.toArray()
+        val a = src.intArray
 
         val identity = identity(this.rowLength)
 
