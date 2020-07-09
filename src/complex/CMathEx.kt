@@ -1,5 +1,8 @@
 package complex
 
+fun Number.toComplex(): Complex =
+    Complex(this)
+
 val Number.complex: Complex
     get() = Complex(this)
 
