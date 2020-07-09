@@ -316,4 +316,16 @@ open class Matrix<T>(val dim: Size = Size(3, 3), val initBlock: (r: Int, c: Int)
         result = 31 * result + internalMatrix.hashCode()
         return result
     }
+
+    override fun component1(): Vector<out T> =
+        this[0]
+
+    override fun component2(): Vector<out T> =
+        this[1]
+
+    override fun component3(): Vector<out T> =
+        this[2]
+
+    override fun component4(): Vector<out T> =
+        this[3]
 }

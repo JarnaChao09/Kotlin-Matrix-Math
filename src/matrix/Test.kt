@@ -304,14 +304,22 @@ fun main() {
 //
 //    println(IntMatrix.diagonal(9, 5, -3, 4).firstMinor(1, 2))
 //    println(DoubleMatrix.diagonal(9.0, 5.0, -3.0, 4.0).firstMinor(1, 2))
-
-    val test = IntMatrix.ones(3 by 3)
-
-    println(test)
-
-    test += IntMatrix.ones(3 by 3)
-
-    println(test)
-
-    println(test + IntMatrix.ones(3 by 3))
+//
+//    val test = IntMatrix.ones(3 by 3)
+//
+//    println(test)
+//
+//    test += IntMatrix.ones(3 by 3)
+//
+//    println(test)
+//
+//    println(test + IntMatrix.ones(3 by 3))
+//
+//    val test = DoubleMatrix.of(2 by 2, 7, 6, 3, 9)
+//
+//    println(test.determinant())
+//
+//    println(DoubleMatrix.diagonal(9, 5, -3, 4).cofactor(1, 1))
+//
+//    println(test.adjugate())
 }

@@ -3,12 +3,12 @@ package complex
 import complex.*
 
 fun main() {
-    val test1 = Complex(10, 10)
-    val test2 = Complex(2, 2)
-    var test3 = Complex(2, 2)
-    println(Complex(10) * test1.conjugate - Complex(2).conjugate * Complex(2).conjugate)
-    println(10 * test1.conjugate - 2.conjugate * 2.conjugate)
-
+//    val test1 = Complex(10, 10)
+//    val test2 = Complex(2, 2)
+//    var test3 = Complex(2, 2)
+//    println(Complex(10) * test1.conjugate - Complex(2).conjugate * Complex(2).conjugate)
+//    println(10 * test1.conjugate - 2.conjugate * 2.conjugate)
+//
 //    println("Value 1: $test1")
 //
 //    test3 += test1

@@ -10,6 +10,7 @@ import vector.Vector
 import java.lang.IllegalArgumentException
 import java.util.stream.IntStream
 import kotlin.math.absoluteValue
+import kotlin.math.pow
 
 import kotlin.reflect.KClass
 
@@ -111,6 +112,18 @@ class IntMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Int): NumberMatrix<Int
     override fun rowAppend(other: MatrixBase<Int>): IntMatrix = super.rowAppend(other) as IntMatrix
 
     override fun colAppend(other: MatrixBase<Int>): IntMatrix = super.colAppend(other) as IntMatrix
+
+    override fun component1(): IntVector =
+        super.component1() as IntVector
+
+    override fun component2(): IntVector =
+        super.component2() as IntVector
+
+    override fun component3(): IntVector =
+        super.component3() as IntVector
+
+    override fun component4(): IntVector =
+        super.component4() as IntVector
 
     override var internalMatrix: Vector<Vector<Int>> =
         Vector(dim.x) { i -> IntVector(dim.y) { j -> initBlock(i, j) } }
@@ -338,17 +351,79 @@ class IntMatrix(dim: Size, initBlock: (r: Int, c: Int) -> Int): NumberMatrix<Int
         return identity
     }
 
-    override fun determinant(): Double {
-        TODO("Not yet implemented")
+    override fun determinant(): Int {
+        return when(this.rowLength) {
+            0 -> 1
+            1 -> this[0, 0]
+            2 -> + this[0, 0] * this[1, 1] - this[0, 1] * this[1, 0]
+            3 -> {
+                val (m0, m1, m2) = this
+                (+ m0[0] * m1[1] * m2[2] - m0[0] * m1[2] * m2[1]
+                 - m0[1] * m1[0] * m2[2] + m0[1] * m1[2] * m2[0]
+                 + m0[2] * m1[0] * m2[1] - m0[2] * m1[1] * m2[0])
+            }
+            4 -> {
+                val (m0, m1, m2, m3) = this
+                (+ m0[0] * m1[1] * m2[2] * m3[3] - m0[0] * m1[1] * m2[3] * m3[2]
+                 - m0[0] * m1[2] * m2[1] * m3[3] + m0[0] * m1[2] * m2[3] * m3[1]
+                 + m0[0] * m1[3] * m2[1] * m3[2] - m0[0] * m1[3] * m2[2] * m3[1]
+                 - m0[1] * m1[0] * m2[2] * m3[3] + m0[1] * m1[0] * m2[3] * m3[2]
+                 + m0[1] * m1[2] * m2[0] * m3[3] - m0[1] * m1[2] * m2[3] * m3[0]
+                 - m0[1] * m1[3] * m2[0] * m3[2] + m0[1] * m1[3] * m2[2] * m3[0]
+                 + m0[2] * m1[0] * m2[1] * m3[3] - m0[2] * m1[0] * m2[3] * m3[1]
+                 - m0[2] * m1[1] * m2[0] * m3[3] + m0[2] * m1[1] * m2[3] * m3[0]
+                 + m0[2] * m1[3] * m2[0] * m3[1] - m0[2] * m1[3] * m2[1] * m3[0]
+                 - m0[3] * m1[0] * m2[1] * m3[2] + m0[3] * m1[0] * m2[2] * m3[1]
+                 + m0[3] * m1[1] * m2[0] * m3[2] - m0[3] * m1[1] * m2[2] * m3[0]
+                 - m0[3] * m1[2] * m2[0] * m3[1] + m0[3] * m1[2] * m2[1] * m3[0])
+            }
+            else -> {
+                fun determinantBareiss(): Int {
+                    val size = this.rowLength
+                    val last = size - 1
+                    val a = this.intArray
+                    val noPivot = 0
+                    var sign = +1
+                    var pivot = 1
+                    for (k in 0 until size) {
+                        val previousPivot = pivot
+                        pivot = a[k][k]
+                        if (pivot == 0) {
+                            val switch = (k+1 until size).find {
+                                a[it][k] != 0
+                            } ?: noPivot
+                            val temp = a[switch]
+                            a[switch] = a[k]
+                            a[k] = temp
+                            pivot = a[k][k]
+                            sign = -sign
+                        }
+                        for (i in (k+1)..last) {
+                            val ai = a[i]
+                            for (j in (k+1)..last) {
+                                ai[j] = (pivot * ai[j] - ai[k] * a[k][j]) / previousPivot
+                            }
+                        }
+                    }
+                    return sign * pivot
+                }
+                determinantBareiss()
+            }
+        }
     }
 
-    override fun adjugate(): IntMatrix {
-        TODO("Not yet implemented")
-    }
+    override fun adjugate(): IntMatrix =
+        IntMatrix(this.size) { r, c ->
+            this.cofactor(c, r)
+        }
 
-    override fun cofactor(row: Int, col: Int): Int {
-        TODO("Not yet implemented")
-    }
+    override fun cofactor(row: Int, col: Int): Int =
+        if (this.isEmpty())
+            throw RuntimeException("cofactor of empty matrix is not defined")
+        else if (!this.isSquare())
+            throw Error.DimensionMisMatch()
+        else
+            firstMinor(row, col).determinant() * ((-1.0).pow(row + col)).toInt()
 
     override fun firstMinor(row: Int, col: Int): IntMatrix {
         if (this.isEmpty()) throw RuntimeException("First Minor of Empty Matrix is not defined")

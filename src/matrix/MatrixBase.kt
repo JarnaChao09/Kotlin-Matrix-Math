@@ -58,4 +58,12 @@ interface MatrixBase<T>: Iterable<T> where T: Any {
     fun toVector(): Vector<out Vector<T>>
 
     fun toList(): List<List<T>>
+
+    operator fun component1(): Vector<out T>
+
+    operator fun component2(): Vector<out T>
+
+    operator fun component3(): Vector<out T>
+
+    operator fun component4(): Vector<out T>
 }

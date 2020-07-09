@@ -93,7 +93,7 @@ abstract class NumberMatrix<T>(dim: Size, initBlock: (r: Int, c: Int) -> T): Mat
 
     abstract fun inverse(): NumberMatrix<T>
 
-    abstract fun determinant(): Double
+    abstract fun determinant(): T
 
     abstract fun cofactor(row: Int, col: Int): T
 
@@ -122,7 +122,7 @@ abstract class NumberMatrix<T>(dim: Size, initBlock: (r: Int, c: Int) -> T): Mat
     fun isHermitian(): Boolean {
         if (!this.isSquare()) throw Error.DimensionMisMatch()
         var ret = true
-        this.forEachIndexed(Selector.UPPER) { v, r, c -> ret = ret && (Complex(v) == Complex(v).conjugate) }
+        this.forEach(Selector.UPPER) { v -> ret = ret && (Complex(v) == Complex(v).conjugate) }
         return ret
     }
 
