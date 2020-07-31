@@ -33,10 +33,10 @@ sealed class Fun(
         return this.eval(map)
     }
 
-    fun evalAllAt(value: Number): Fun {
+    fun evalAllAt(value: Number = 0): Fun {
         val map = emptyMap<Fun, Constant>().toMutableMap()
         for (i in variables) {
-            map[i] = 0.const
+            map[i] = value.const
         }
         return this.eval(map)
     }
@@ -456,7 +456,7 @@ data class Ln(val a: Fun): Fun() {
         else -> kotlin.math.ln(calc)
     }
 
-    override fun partialEval(value: Map<Fun, Constant>): Fun = when (val pCalc = a.partialEval(value)) {
+    override fun partialEval(value: Map<Fun, Constant>): Fun = when (a.partialEval(value)) {
         0.0.const -> Double.MIN_VALUE.const
         else -> Ln(a.partialEval(value))
     }

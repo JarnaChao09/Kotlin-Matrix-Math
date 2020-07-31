@@ -38,6 +38,8 @@ open class Matrix<T>(val dim: Size = Size(3, 3), val initBlock: (r: Int, c: Int)
         initBlock = { r, c -> matListOfVector[r][c] }
     )
 
+    constructor(matrix: Matrix<T>): this(dim = matrix.size, initBlock = { r, c -> matrix[r, c]})
+
     constructor(dim1: Size, asRows: Boolean, initBlock: (Int) -> T): this(dim = dim1, initBlock = if (asRows) { _, i -> initBlock(i) } else { r, _ -> initBlock(r) })
 
     sealed class Scope<T> where T: Any {
@@ -282,7 +284,6 @@ open class Matrix<T>(val dim: Size = Size(3, 3), val initBlock: (r: Int, c: Int)
         var maxLength = 0
         internalMatrix.forEach { it.forEach { i -> maxLength = max(maxLength, i.toString().length) } }
         for (r  in internalMatrix) {
-            var i = 0
             val dummy = Vector(length = 0) { "" }
             for (c in r) {
                 dummy append (" " * (maxLength - c.toString().length) + c.toString())
